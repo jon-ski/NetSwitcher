@@ -1,5 +1,19 @@
+<#
+.SYNOPSIS
+This is a simple script for managing IP addresses.
+
+.DESCRIPTION
+This script allows you to switch between different IP configurations.
+
+.PARAMETER IPAddress
+The IP address to set. Use "auto" for DHCP.
+
+.EXAMPLE
+.\netswitch.ps1 192.168.1.2/24
+#>
+
 # Function to display Help Text
-function Display-Help {
+function Show-Help {
     Write-Host "Usage: YourScriptName.ps1 [COMMAND] [ARGUMENTS]"
     Write-Host ""
     Write-Host "Commands:"
@@ -10,7 +24,7 @@ function Display-Help {
 }
 
 # Function to initialize the config file
-function Init-Config {
+function Initialize-Config {
     # List network interfaces
     $interfaces = Get-NetAdapter | Select-Object Name, Status
     $count = 1
@@ -48,7 +62,7 @@ function Set-StaticIP {
     # Extract IP address and Subnet Mask
     $ipAddress, $subnetBits = $ipInfo -split '/'
     $subnetMask = [IPAddress]::Parse("255.255.255.255").GetAddressBytes()
-    $subnetMask[3] = [byte]([math]::Floor(-shl 1 ($subnetBits - 24)))
+    $subnetMask[3] = [byte]([math]::Floor(1 -shl ($subnetBits - 24)))
     $subnetMask = [IPAddress]::Parse($subnetMask).IPAddressToString
 
     Write-Host "Setting IP address to $ipAddress with a subnet mask of $subnetMask for $interfaceName."
@@ -57,9 +71,9 @@ function Set-StaticIP {
 
 # Main Script Logic
 if ($args.Length -eq 0) {
-    Display-Help
+    Show-Help
 } elseif ($args[0] -eq "init") {
-    Init-Config
+    Initialize-Config
 } elseif ($args[0] -eq "auto") {
     if (Test-Path "config.json") {
         $config = Get-Content "config.json" | ConvertFrom-Json
