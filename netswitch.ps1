@@ -29,7 +29,7 @@ function Init-Config {
         InterfaceName = $selectedInterface
     } | ConvertTo-Json
 
-    Set-Content -Path "config.txt" -Value $config
+    Set-Content -Path "config.json" -Value $config
     Write-Host "Config file created with selected interface."
 }
 
@@ -61,16 +61,16 @@ if ($args.Length -eq 0) {
 } elseif ($args[0] -eq "init") {
     Init-Config
 } elseif ($args[0] -eq "auto") {
-    if (Test-Path "config.txt") {
-        $config = Get-Content "config.txt" | ConvertFrom-Json
+    if (Test-Path "config.json") {
+        $config = Get-Content "config.json" | ConvertFrom-Json
         $interfaceName = $config.InterfaceName
         Set-DHCP
     } else {
         Write-Host "Config file not found. Please initialize the config file by running the script with 'init' argument."
     }
 } else {
-    if (Test-Path "config.txt") {
-        $config = Get-Content "config.txt" | ConvertFrom-Json
+    if (Test-Path "config.json") {
+        $config = Get-Content "config.json" | ConvertFrom-Json
         $interfaceName = $config.InterfaceName
         foreach ($ip in $args) {
             Set-StaticIP $ip
